@@ -95,15 +95,18 @@ def get_price(html, site_name):
     return price.amount_float
 
 def process_products(df):
-    updated_products = []
-    for product in df.to_dict("records"):
-        html, site_name = get_response(product["url"])
-        product["price"] = get_price(html, site_name)
-        product["alert"] = product["price"] < product["alert_price"]
-        if product["alert"] is True:
-            asyncio.run(send_message(product["product"], product["url"], product["price"]))
-        updated_products.append(product)
-    return pd.DataFrame(updated_products)
+    try:
+        updated_products = []
+        for product in df.to_dict("records"):
+            html, site_name = get_response(product["url"])
+            product["price"] = get_price(html, site_name)
+            product["alert"] = product["price"] < product["alert_price"]
+            if product["alert"] is True:
+                asyncio.run(send_message(product["product"], product["url"], product["price"]))
+            updated_products.append(product)
+        return pd.DataFrame(updated_products)
+    except Exception as error:
+        print(error)
 
 async def send_message(product, url, price):
     bot = Bot(TELEGRAM_TOKEN)
