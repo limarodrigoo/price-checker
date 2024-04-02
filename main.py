@@ -8,6 +8,7 @@ from price_parser import Price
 from telegram import Bot
 from urllib.parse import urlparse
 from dotenv import load_dotenv
+from fake_useragent import UserAgent
 
 load_dotenv()
 
@@ -43,6 +44,10 @@ def get_response(url):
     }
     if site_name == 'amazon':
         headers = {"accept-language": "en-US,en;q=0.9","accept-encoding": "gzip, deflate, br","User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36","accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"}
+    ua = UserAgent(browsers=['edge', 'chrome'])
+    user_agent_random = ua.random
+    headers["User-Agent"] = user_agent_random
+    print(headers)
     response = requests.get(url, headers=headers)
     return response.text, site_name
 
@@ -80,6 +85,7 @@ def get_amazon_price(html):
 
 def get_price(html, site_name):
     price = 0
+    print(site_name)
     try:
         if site_name == 'kabum':
             price = get_kabum_price(html)
@@ -130,12 +136,16 @@ def main():
     try:
         df_updated = process_products(df)
         if SAVE_TO_CSV:
+            cols = list(df_updated)
+            cols.remove('url')
+            cols.append('url')
+            df_updated = df_updated[cols]
             df_updated.to_csv(PRICES_CSV, index=False, mode="w")
-    except:
-        print("DEU RUIM!")
+    except Exception as error:
+        print(f"ERROR!{error}")
 
 while True:
     main()
     
-    time.sleep(30)
+    time.sleep(30 * 60)
         

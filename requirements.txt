@@ -5,3 +5,4 @@ lxml==5.2.0
 price-parser==0.3.4
 python-telegram-bot
 python-dotenv
+fake_useragent
