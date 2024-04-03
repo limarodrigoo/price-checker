@@ -51,5 +51,5 @@ def main():
 while True:
     main()
     
-    time.sleep(15)
+    time.sleep(60)
         
